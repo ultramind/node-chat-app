@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
     socket.on('getLocation', (coords, response) => {
         var user = users.getUser(socket.id);
 
-        if (user && isRealString(message.text)) {
+        if (user) {
             io.to(user.room).emit('getLocation', generateLocation(user.name, coords));
         }
         
