@@ -19,12 +19,32 @@ function scrollTobottom() {
 
 socket.on('connect', function() {
     console.log('Connectes to Server');
+    var params = jQuery.deparam(window.location.search);
+
+    socket.emit('join', params, function (err) {
+        if (err) {
+            alert(err);
+            window.location.href = '/';
+        }else{
+
+        }
+    });
     
 });
 
 socket.on('disconnect', function() {
     console.log('Disconnected from server');
 });
+
+socket.on('updateList', function(usersList) {
+    var ol = jQuery('<ol></ol>');
+    usersList.forEach(function (user) {
+        ol.append(jQuery('<li></li>').text(user));
+    });
+    jQuery('#users').html(ol);
+    console.log('Update list ', usersList);
+})
+
 socket.on('newMessage', function (message) {
     var formattedTime = moment(message.createdAt).format('h:mm a');
     var template = jQuery('#message-template').html();
@@ -37,7 +57,7 @@ socket.on('newMessage', function (message) {
     jQuery('#messages').append(html);
     scrollTobottom();
     // var formattedTime = moment(message.createdAt).format('h:mm a');
-    // console.log('New message', message);
+     console.log('New message', message);
     // var li = jQuery('<li></li>');
 
     // li.text(`${message.from}: ${formattedTime} ${message.text}`);
@@ -85,14 +105,15 @@ locationButton.on('click', function () {
     }
     locationButton.attr('disabled', 'disabled').text('sending Location...');
     navigator.geolocation.getCurrentPosition(function (position) {
-        locationButton.removeAttr('disabled').text('Sedn Location');
+        locationButton.removeAttr('disabled').text('Send Location');
         socket.emit('getLocation', {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
         });
      }, function () {
-         locationButton.attr('disabled', 'disabled').test('Send Location')
+         locationButton.attr('disabled', 'disabled').text('Send Location')
         alert('Unable to fetch location');
     });
 });
 
+ 
